@@ -5,41 +5,55 @@ import re
 with open("words_alpha.txt", "r") as f:
 	words = f.read().splitlines()
 
-# convert numeric ciphertext into alphabetic
-def convertNumberCiphertext():
-	ciphertext = """7 12 26 20   14 4   22 4 15   14 4   7 12 3 2   22 4 15   12 26 16 3   2 15 6 3 24 25 5   5 4 14 3 23 
+with open("cipher.txt", "r") as cf:
+	ciphertext = cf.read().lower()
 
-	24 26 20 12 3 24   20 12 26 2   26 8 9 12 26 18 3 20 25 5 ?  
-
-	26 2 23 7 3 24 :   20 12 3   23 26 6 3   20 12 25 2 10 .   23 25 6 9 8 3   23 15 18 23 20 26 20 25 4 2 23  
-
-	24 3 9 8 26 5 3   4 2 3   23 22 6 18 4 8   4 21   9 8 26 25 2 20 3 17 20   7 25 20 12   4 2 3  
-
-	23 22 6 18 4 8   4 21   5 25 9 12 3 24 20 3 17 20 ."""
-
-	ciphertext = " ".join(ciphertext.split('\n'))
-	cipherAlpha = ""
+# converts numeric ciphertext into alphabetic
+# each new number is assigned a new alphabetic char
+# returns alphabetic ciphertext
+def convertNumberCiphertext(ciphertext):
 	alphabet = string.ascii_lowercase
+	num2letter = {}
+	cipherAlpha = ""
 
+	# convert ugly numeric ciphertext format
+	# in to something usable
+	ciphertext = " ".join(ciphertext.split('\n'))
 	a1 = ciphertext.split("  ")
 	a2 = []
 	for each in a1:
 		a3 = each.split()
 		a2.append(a3)
 
+	i = 0
+	# go through each word, each letter
+	# assign each new numer a letter
 	for word in a2:
 		if len(word) > 0:
 			for char in word:
 				if char.isnumeric():
-					cipherAlpha += alphabet[int(char) - 1]
+					# cipherAlpha += alphabet[int(char) - 1]
+					if char in num2letter.keys():
+						cipherAlpha += num2letter[char]
+					else: 
+						num2letter[char] = alphabet[i]
+						cipherAlpha += num2letter[char]
+						i += 1
 				else:
 					cipherAlpha += char
 			cipherAlpha += " "
-
+	print("number to letter mapping:")
+	print(num2letter)
 	return(cipherAlpha)
+
+# ~ example ciphertexts ~
 # ciphertext = "KCXCHUHCRIB KCGO RIKA CI RDW XCITB. QDH CP YO DBO RDW CXUZCIUHCRIB, RDW JRBBCQCKCHCOB QOVRXO KCXCHKOBB. —FUXCO JURKCIOHHC".lower()
 # ciphertext = "glzt nd vdo nd glcb vdo lzpc bofcxye edncw xztlcx tlzb zhilzrctye? zbwgcx: tlc wzfc tlybj. wyfihc worwtztydbw xcihzec dbc wvfrdh du ihzybtcqt gytl dbc wvfrdh du eyilcxtcqt."
-ciphertext = convertNumberCiphertext()
+# ciphertext = convertNumberCiphertext()
+
+# if the ciphertext is numeric, convert it into alphabetic
+if ciphertext[0].isnumeric():
+	ciphertext = convertNumberCiphertext(ciphertext)
 
 # please don't judge this, it hurts me too
 # just making the ciphertext easier to work with
@@ -49,7 +63,7 @@ for char in ciphertext:
 		ciphertext_clean += char
 	elif char == " ":
 		ciphertext_clean += char
-print("Ciphertext --> " + ciphertext_clean)
+print("\nCiphertext --> " + ciphertext_clean)
 cipher_words_list = ciphertext_clean.split()
 cipher_words = sorted(cipher_words_list, key=len)
 cipher_words.reverse()
@@ -203,7 +217,7 @@ def decode(ciphertext, end=False):
 				y = each.split(':')
 				mapping[y[0]] = y[1]
 
-			print('\n')
+			print('\n------ new message ------\n')
 			# decode further with new additions to mapping dic
 			decode(ciphertext)
 
